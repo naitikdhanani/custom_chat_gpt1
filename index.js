@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json());
 
 const openai =  new OpenAI({
-    apiKey:'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'
+    apiKey: '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'
   });
 
 
@@ -16,12 +16,13 @@ app.post("/ask", async (req, res) => {
   const prompt = req.body.prompt;
 
   try {
+    console.log(prompt);
     if (prompt == null) {
       throw new Error("Uh oh, no prompt was provided");
     }
 
     const response = await openai.completions.create({
-        model: "davinci-002",
+        model: "gpt-3.5-turbo-instruct",
         prompt,
         max_tokens: 500,
       });

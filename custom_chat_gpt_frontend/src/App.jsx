@@ -51,7 +51,7 @@ function App() {
            style={{
             backgroundImage: loading ? `url(${loadingGif})` : `url(${lens})`,
           }}
-          onChange={(e) => updatePrompt(e.target.dataue)}
+          onChange={(e) => updatePrompt(e.target.value)}
           onKeyDown={(e) => sendPrompt(e)}
             type="text"
             className="spotlight__input"
