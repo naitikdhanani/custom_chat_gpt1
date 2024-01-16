@@ -1,0 +1,4 @@
+#RUN DEV SERVER
+npm run dev
+#TO RUN EXPRESS SERVER
+NODE index.js
