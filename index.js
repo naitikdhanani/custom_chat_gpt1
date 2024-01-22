@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const OpenAI=require( 'openai');
+const cors=require('cors');
 
 const app = express();
 app.use(express.json());
@@ -9,6 +10,10 @@ const apiKey=process.env.VUE_APP_OPENAI_API_KEY;
 const openai =  new OpenAI({
    apiKey:apiKey
   });
+  app.use(cors({
+    origin:"https://custom-chat-gpt-server.onrender.com",
+  }))
+
 
 
 const port = process.env.PORT || 5000;
