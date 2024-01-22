@@ -10,9 +10,7 @@ const apiKey=process.env.VUE_APP_OPENAI_API_KEY;
 const openai =  new OpenAI({
    apiKey:apiKey
   });
-  app.use(cors({
-    origin:"https://custom-chat-gpt-server.onrender.com",
-  }))
+  app.use(cors())
 
 
 
