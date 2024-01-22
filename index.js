@@ -28,7 +28,7 @@ app.post("/ask", async (req, res) => {
     const response = await openai.completions.create({
         model: "gpt-3.5-turbo-instruct",
         prompt,
-        max_tokens: 500,
+        max_tokens: 1000,
       });
 
     const completion = response.choices[0].text;
