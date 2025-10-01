@@ -1,52 +1,65 @@
 require("dotenv").config();
 const express = require("express");
-const OpenAI=require( 'openai');
-const cors=require('cors');
+const { GoogleGenAI } = require("@google/genai");
+const cors = require("cors");
 
 const app = express();
 app.use(express.json());
-const apiKey=process.env.VUE_APP_OPENAI_API_KEY;
-
-const openai =  new OpenAI({
-   apiKey:apiKey
-  });
-  app.use(cors())
-
-
+app.use(cors());
+const apiKey = process.env.GEMINI_API_KEY; 
+const ai = new GoogleGenAI({apiKey:apiKey});
 
 const port = process.env.PORT || 5000;
 
 app.post("/ask", async (req, res) => {
-  const prompt = req.body.prompt;
+  // The user's input (e.g., "A robot who loves to garden")
+  const userInput = req.body.prompt;
 
   try {
-    console.log(prompt);
-    if (prompt == null) {
-      throw new Error("Uh oh, no prompt was provided");
+    console.log(`Received user input for story: ${userInput}`);
+    if (!userInput) {
+      throw new Error("Uh oh, no input was provided to start the story");
     }
 
-    const response = await openai.completions.create({
-        model: "gpt-3.5-turbo-instruct",
-        prompt,
-        max_tokens: 1000,
-      });
+    // --- The key change is here: Constructing the System and User Prompts ---
 
-    const completion = response.choices[0].text;
+    // 1. Define the story instruction for the model (System/Preamble)
+    const storyInstruction = `You are a creative storyteller. Based on the following user input, write a short, compelling, and descriptive story. Ensure the story has a clear beginning, middle, and end. The story should be around 200 words.`;
+    
+    // 2. Combine the instruction and the user's input into the final prompt
+    const fullPrompt = `${storyInstruction}\n\nUser Input/Concept: "${userInput}"`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      // Pass the fully constructed prompt to the model
+      contents: [fullPrompt], 
+      config: {
+        // Increase maxOutputTokens to ensure the story has enough room to breathe
+        maxOutputTokens: 2000, 
+        temperature: 0.8, // Use a higher temperature for more creative, varied stories
+      }
+    });
+
+    const completion = response.text;
+
+    if (!completion) {
+      return res.status(500).json({
+        success: false,
+        message: "Gemini returned no response text for the story.",
+      });
+    }
 
     return res.status(200).json({
       success: true,
       message: completion,
     });
   } catch (error) {
-    if (error instanceof OpenAI.APIError) {
-        console.error(error.status);  // e.g. 401
-        console.error(error.message); // e.g. The authentication token you passed was indataid...
-        console.error(error.code);  // e.g. 'indataid_api_key'
-        console.error(error.type);  // e.g. 'indataid_request_error'
-      } else {
-        // Non-API error
-        console.log(error);
-      }
+    console.error("An error occurred while creating the story:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while trying to create your story.",
+    });
   }
 });
 
