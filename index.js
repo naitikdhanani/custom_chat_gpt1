@@ -13,18 +13,22 @@ const port = process.env.PORT || 5000;
 
 app.post("/ask", async (req, res) => {
   // The user's input (e.g., "A robot who loves to garden")
+
   const userInput = req.body.prompt;
+  var temperature = req.body.temperature;
+  if (temperature == null)
+    temperature = 0.8
 
   try {
-    console.log(`Received user input for story: ${userInput}`);
+    console.log(`Received user input for story: ${userInput} ${temperature}`);
     if (!userInput) {
       throw new Error("Uh oh, no input was provided to start the story");
     }
 
-    // --- The key change is here: Constructing the System and User Prompts ---
+
 
     // 1. Define the story instruction for the model (System/Preamble)
-    const storyInstruction = `You are a creative storyteller. Based on the following user input, write a short, compelling, and descriptive story. Ensure the story has a clear beginning, middle, and end. The story should be around 200 words.`;
+    const storyInstruction = `You are a creative storyteller. Based on the following user input, write a short, compelling, and descriptive story. Ensure the story has a clear beginning, middle, and end. The story should be around 200 words.The story must have a normal beginning but it should end in a crazy manner. Do not hesitate to use fictional elements. Add a twist and make it funny`;
     
     // 2. Combine the instruction and the user's input into the final prompt
     const fullPrompt = `${storyInstruction}\n\nUser Input/Concept: "${userInput}"`;
@@ -36,7 +40,7 @@ app.post("/ask", async (req, res) => {
       config: {
         // Increase maxOutputTokens to ensure the story has enough room to breathe
         maxOutputTokens: 2000, 
-        temperature: 0.8, // Use a higher temperature for more creative, varied stories
+        temperature: temperature 
       }
     });
 
@@ -63,4 +67,4 @@ app.post("/ask", async (req, res) => {
   }
 });
 
-app.listen(port, () => console.log(`Server is running on port ${port}!!`));
+app.listen(5050, () => console.log(`Server is running on port ${5050}!!`));
